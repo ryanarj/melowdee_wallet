@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -28,10 +29,7 @@ func genWalletHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "POST request successful")
 	password := r.FormValue("password")
-
-	fmt.Fprintf(w, " Generating Wallet!")
 
 	path := generate(password)
 
@@ -53,6 +51,18 @@ func genWalletHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Public ", hexutil.Encode(pubData))
 
 	fmt.Println("Add ", crypto.PubkeyToAddress(key.PrivateKey.PublicKey).Hex())
+
+	data := make(map[string]string)
+	data["private"] = hexutil.Encode(pData)
+	data["public"] = hexutil.Encode(pubData)
+	data["address"] = crypto.PubkeyToAddress(key.PrivateKey.PublicKey).Hex()
+
+	if err != nil {
+		// handle error
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
+
 }
 
 func generate(password string) string {
