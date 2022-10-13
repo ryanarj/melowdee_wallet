@@ -1,15 +1,23 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
+var (
+	url = "https://kovan.infura.io/v3/a197fe7fa0684b3b8ad84bf01fd2da89"
 )
 
 func genWalletHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +81,23 @@ func generate(password string) string {
 		log.Fatal(err)
 	}
 	return account.URL.Path
+}
+
+func checkBalance(address string) *big.Int {
+
+	client, err := ethclient.Dial(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+	a1 := common.HexToAddress(address)
+
+	b1, err := client.BalanceAt(context.Background(), a1, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return b1
 }
 
 func main() {
