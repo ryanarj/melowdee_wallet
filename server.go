@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	url = "https://kovan.infura.io/v3/a197fe7fa0684b3b8ad84bf01fd2da89"
+	url = "https://goerli.infura.io/v3/a197fe7fa0684b3b8ad84bf01fd2da89"
 )
 
 func genWalletHandler(w http.ResponseWriter, r *http.Request) {
