@@ -73,6 +73,37 @@ func genWalletHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func checkBalanceHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Error(w, "Method is not supported.", http.StatusNotFound)
+		return
+	}
+
+	if r.URL.Path != "/checkBalance" {
+		http.Error(w, "404 not found.", http.StatusNotFound)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		fmt.Fprintf(w, "ParseForm() err: %v", err)
+		return
+	}
+
+	address := r.FormValue("address")
+
+	balance := checkBalance(address)
+
+	fmt.Println("balance ", balance)
+
+	data := make(map[string]string)
+	data["balance"] = balance.String()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
+
+}
+
 func generate(password string) string {
 	key := keystore.NewKeyStore("./wallet", keystore.StandardScryptN, keystore.StandardScryptP)
 	passord := password
@@ -102,7 +133,8 @@ func checkBalance(address string) *big.Int {
 
 func main() {
 
-	http.HandleFunc("/genWallet", genWalletHandler) // Update this line of code
+	http.HandleFunc("/genWallet", genWalletHandler)       // Update this line of code
+	http.HandleFunc("/checkBalance", checkBalanceHandler) // Update this line of code
 
 	fmt.Printf("Starting server at port 8080\n")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
