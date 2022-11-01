@@ -121,6 +121,7 @@ func checkBalance(address string) *big.Int {
 		log.Fatal(err)
 	}
 	defer client.Close()
+	fmt.Println(address)
 	a1 := common.HexToAddress(address)
 
 	b1, err := client.BalanceAt(context.Background(), a1, nil)
